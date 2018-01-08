@@ -14,18 +14,12 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<!-- Default background styles for car setup wizard buttons when enabled/disabled. -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false">
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/car_button_radius" />
-            <solid android:color="@color/car_grey_300"/>
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/car_radius_1" />
-            <solid android:color="@color/car_suw_blue"/>
-        </shape>
-    </item>
-</selector>
+<Button
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="?android:attr/borderlessButtonStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/car_button_height"
+    android:layout_gravity="center_vertical"
+    android:layout_marginStart="@dimen/car_padding_4"
+    android:ellipsize="end"
+    android:maxLines="1"/>
