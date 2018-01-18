@@ -29,10 +29,13 @@ import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.CarSetupWizardLibRobolectricTestRunner;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
+
+import java.util.Locale;
 
 /**
  * Tests for the CarSetupWizardLayout
@@ -40,6 +43,10 @@ import org.robolectric.RuntimeEnvironment;
 @RunWith(CarSetupWizardLibRobolectricTestRunner.class)
 public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     private static final String TAG = "CarSetupWizardLayoutTest";
+
+    private static final Locale LOCALE_EN_US = new Locale("en", "US");
+    // Hebrew locale can be used to test RTL.
+    private static final Locale LOCALE_IW_IL = new Locale("iw", "IL");
 
     private boolean isClicked;
     private CarSetupWizardLayout mCarSetupWizardLayout;
@@ -102,15 +109,18 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     }
 
     /**
-     * Test that setBackButtonVisible does set the back button visibility
+     * Test that setBackButtonVisible does set the back button visibility and updates the touch
+     * delegate accordingly
      */
     @Test
     public void testSetBackButtonVisible() {
         mCarSetupWizardLayout.setBackButtonVisible(true);
         assertThat(mBackButton.getVisibility()).isEqualTo(View.VISIBLE);
+        assertThat(((View) mBackButton.getParent()).getTouchDelegate()).isNotNull();
 
         mCarSetupWizardLayout.setBackButtonVisible(false);
         assertThat(mBackButton.getVisibility()).isEqualTo(View.GONE);
+        assertThat(((View) mBackButton.getParent()).getTouchDelegate()).isNull();
     }
 
     /**
@@ -244,6 +254,39 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
 
         mCarSetupWizardLayout.setProgressBarVisible(false);
         assertThat(mProgressBar.getVisibility()).isEqualTo(View.GONE);
+    }
+
+    @Test
+    @Ignore
+    public void testApplyUpdatedLocale() {
+        mCarSetupWizardLayout.applyLocale(LOCALE_IW_IL);
+        assertThat(mToolbarTitleView.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_RTL);
+        assertThat(mToolbarTitleView.getTextLocale()).isEqualTo(LOCALE_IW_IL);
+        assertThat(mPrimaryToolbarButton.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_RTL);
+        assertThat(mPrimaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_IW_IL);
+        assertThat(mSecondaryToolbarButton.getLayoutDirection())
+                .isEqualTo(View.LAYOUT_DIRECTION_RTL);
+        assertThat(mSecondaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_IW_IL);
+
+        mCarSetupWizardLayout.applyLocale(LOCALE_EN_US);
+        assertThat(mToolbarTitleView.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
+        assertThat(mToolbarTitleView.getTextLocale()).isEqualTo(LOCALE_EN_US);
+        assertThat(mPrimaryToolbarButton.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
+        assertThat(mPrimaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_EN_US);
+        assertThat(mSecondaryToolbarButton.getLayoutDirection())
+                .isEqualTo(View.LAYOUT_DIRECTION_LTR);
+        assertThat(mSecondaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_EN_US);
+    }
+
+    /**
+     * Test that setProgressBarProgress does set the progress bar progress
+     */
+    @Test
+    public void testSetProgressBarProgress() {
+        int progress = 80;
+        mCarSetupWizardLayout.setProgressBarProgress(progress);
+        assertThat(mProgressBar.isIndeterminate()).isFalse();
+        assertThat(mProgressBar.getProgress()).isEqualTo(progress);
     }
 
     /**
