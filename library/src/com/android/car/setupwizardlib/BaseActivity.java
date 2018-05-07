@@ -19,12 +19,15 @@ package com.android.car.setupwizardlib;
 import android.annotation.CallSuper;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.View;
 
+import androidx.annotation.LayoutRes;
+import androidx.annotation.VisibleForTesting;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
 import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
+
 
 /**
  * Base Activity for CarSetupWizard screens that provides a variety of helper functions that make
@@ -39,8 +42,9 @@ import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
  * <p>Provides setters {@link #setBackButtonVisible(boolean)} for setting CarSetupWizardLayout
  * component attributes
  */
-public abstract class BaseActivity extends FragmentActivity {
-    private static final String CONTENT_FRAGMENT_TAG = "CONTENT_FRAGMENT_TAG";
+public class BaseActivity extends FragmentActivity {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    static final String CONTENT_FRAGMENT_TAG = "CONTENT_FRAGMENT_TAG";
     /**
      * Wizard Manager does not actually return an activity result, but if we invoke Wizard
      * Manager without requesting a result, the framework will choose not to issue a call to
@@ -62,7 +66,7 @@ public abstract class BaseActivity extends FragmentActivity {
 
     /**
      * Whether it is safe to make transactions on the
-     * {@link android.support.v4.app.FragmentManager}. This variable prevents a possible exception
+     * {@link androidx.fragment.app.FragmentManager}. This variable prevents a possible exception
      * when calling commit() on the FragmentManager.
      *
      * <p>The default value is {@code true} because it is only after
@@ -85,12 +89,8 @@ public abstract class BaseActivity extends FragmentActivity {
                 finish();
             }
         });
-        setPrimaryToolbarButtonOnClickListener(v -> {
-            defaultOnPrimaryToolbarButtonClicked();
-        });
-        setSecondaryToolbarButtonOnClickListener(v -> {
-            defaultOnSecondaryToolbarButtonClicked();
-        });
+        setPrimaryToolbarButtonOnClickListener(v -> defaultOnPrimaryToolbarButtonClicked());
+        setSecondaryToolbarButtonOnClickListener(v -> defaultOnSecondaryToolbarButtonClicked());
     }
 
     @Override
@@ -343,7 +343,7 @@ public abstract class BaseActivity extends FragmentActivity {
      *
      * <p>Default behavior is call nexAction(RESULT_OK)
      */
-    protected void defaultOnPrimaryToolbarButtonClicked() {
+    protected final void defaultOnPrimaryToolbarButtonClicked() {
         nextAction(RESULT_OK);
     }
 
@@ -394,5 +394,15 @@ public abstract class BaseActivity extends FragmentActivity {
      */
     protected final void setProgressBarVisible(boolean visible) {
         mCarSetupWizardLayout.setProgressBarVisible(visible);
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    final boolean getAllowFragmentCommits() {
+        return mAllowFragmentCommits;
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    final CarSetupWizardLayout getCarSetupWizardLayout() {
+        return mCarSetupWizardLayout;
     }
 }
